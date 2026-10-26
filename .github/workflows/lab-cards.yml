@@ -1,0 +1,39 @@
+# Keeps the auto cards on the lab homepage in sync with repos tagged `lab`.
+# It never edits the page directly: changes arrive as a pull request for you to merge.
+name: Lab cards
+
+on:
+  schedule:
+    - cron: "17 11 * * *"     # daily, ~7am Eastern
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Rebuild auto cards
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 .github/scripts/lab_cards.py
+      - name: Open a pull request if anything changed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet; then echo "Nothing to change."; exit 0; fi
+          branch=lab-cards/update
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git commit -am "Update lab cards from repos tagged lab"
+          git push -f origin "$branch"
+          if gh pr view "$branch" --json state -q .state 2>/dev/null | grep -q OPEN; then
+            echo "Updated the open pull request."
+          else
+            gh pr create --head "$branch" --title "Update lab cards" \
+              --body "Cards for public repos tagged \`lab\` with GitHub Pages on. Merge to publish; close to skip. Hand-written cards aren't touched."
+          fi
