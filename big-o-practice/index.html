@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big O Practice</title>
+<style>
+:root{
+  --bg:#f7f7f5;--card:#fff;--text:#1d1d1f;--muted:#6b6b70;--border:#e3e3e0;
+  --accent:#3b5bdb;--accentbg:#eef1fd;--good:#2b8a3e;--goodbg:#e6f4ea;--bad:#c92a2a;--badbg:#fdecec;
+  --code:#f1f1ee;--kw:#7b3fbf;--num:#b35c00;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#141416;--card:#1e1e21;--text:#ececee;--muted:#9a9aa0;--border:#2e2e33;
+    --accent:#8ea0ff;--accentbg:#252a45;--good:#69db7c;--goodbg:#1c3324;--bad:#ff8787;--badbg:#3a1e1e;
+    --code:#18181b;--kw:#c79bff;--num:#ffb86b;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:720px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:4px 0 12px}
+h2{font-size:18px;margin:0 0 10px}
+nav{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px}
+nav button,.chip{border:1px solid var(--border);background:var(--card);color:var(--text);padding:7px 12px;border-radius:999px;font-size:14px;white-space:nowrap;cursor:pointer}
+nav button.on,.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:14px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{padding:5px 11px;font-size:13px}
+.stats{display:flex;gap:16px;font-size:14px;color:var(--muted);margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.stats b{color:var(--text)}
+.link{background:none;border:none;color:var(--accent);font-size:13px;cursor:pointer;padding:0}
+.meta{display:flex;gap:8px;font-size:12px;color:var(--muted);margin-bottom:8px}
+.tag{background:var(--code);border:1px solid var(--border);border-radius:6px;padding:1px 7px}
+.code{background:var(--code);border:1px solid var(--border);border-radius:10px;padding:10px 0;overflow-x:auto;font:14px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.row{display:flex;align-items:center;gap:10px;padding:0 12px;min-height:24px}
+.row.lit{background:var(--accentbg)}
+.line{white-space:pre;flex:1}
+.cost{font:12px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--accent);background:var(--accentbg);border-radius:6px;padding:1px 7px;white-space:nowrap}
+.kw{color:var(--kw);font-weight:600}.num{color:var(--num)}
+.prompt{margin:14px 0 8px;font-weight:600}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.choices button{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:11px 4px;font-size:15px;cursor:pointer}
+.choices button.right{background:var(--goodbg);border-color:var(--good);color:var(--good);font-weight:700}
+.choices button.wrong{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.choices button:disabled{cursor:default}
+.actions{display:flex;gap:8px;margin-top:12px}
+.btn{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:9px 14px;font-size:15px;cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.fb{margin-top:14px;border-radius:10px;padding:12px 14px}
+.fb.good{background:var(--goodbg)}.fb.bad{background:var(--badbg)}
+.verdict{font-weight:700;margin-bottom:6px}
+.eq{font:14px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;margin:6px 0}
+.muted{color:var(--muted)}
+ol.rules{padding-left:20px;margin:0}
+ol.rules li{margin-bottom:12px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--border);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:13px}
+td code,p code,li code{font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--code);padding:1px 4px;border-radius:4px}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+select,input{font-size:15px;padding:7px 9px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)}
+input{width:120px}
+.seq{font:13px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;word-break:break-word;margin:10px 0}
+.big{font-size:20px;font-weight:700}
+.hide{display:none}
+.cheat{font-size:13px}.cheat td,.cheat th{padding:6px 4px}.cheat td code{font-size:12px;word-break:break-word}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Big O Practice</h1>
+  <nav id="tabs">
+    <button data-tab="practice" class="on">Practice</button>
+    <button data-tab="rules">Rules</button>
+    <button data-tab="tracer">Loop tracer</button>
+    <button data-tab="doubling">Doubling</button>
+    <button data-tab="cheat">Cheat sheet</button>
+  </nav>
+
+  <section id="practice">
+    <div class="chips" id="filters"></div>
+    <div class="stats" id="stats"></div>
+    <div class="card" id="qcard"></div>
+  </section>
+
+  <section id="rules" class="hide">
+    <div class="card">
+      <h2>The rules</h2>
+      <ol class="rules">
+        <li><b>Total = passes × cost per pass.</b> Count how many times a loop runs, then multiply by what each run does.</li>
+        <li><b>Passes come from how the loop variable changes.</b><br>
+          Add or subtract a fixed amount (<code>i+1</code>, <code>i-2</code>) → walking → <b>n</b><br>
+          Multiply or divide by a fixed amount (<code>i*2</code>, <code>i//3</code>) → jumping → <b>log n</b><br>
+          Fixed count that never changes (<code>range(10)</code>) → <b>1</b></li>
+        <li><b>One after another: add, keep the biggest.</b> n + n² → n²</li>
+        <li><b>Nested: multiply.</b> A loop of n inside a loop of n → n²</li>
+        <li><b>Drop constants and smaller terms.</b> 3n² + 100n + 5 → n². Big O only cares about the shape of growth.</li>
+        <li><b>Assume the worst case.</b> A search that might stop early still counts as checking everything.</li>
+        <li><b>Built-ins can hide loops.</b> Ask: does this touch every item, or jump straight there? <code>x in list</code> looks like one step but it's a loop.</li>
+        <li><b>log n = how many times you can halve n before hitting 1.</b> 8 → 4 → 2 → 1 is 3 halvings, so log 8 = 3. A million is only about 20.</li>
+        <li><b>Recursion: calls × work per call.</b> Draw the call tree. One call each time works like a loop; two calls each time doubles every level.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="tracer" class="hide">
+    <div class="card">
+      <h2>Loop tracer</h2>
+      <p class="muted" style="margin-top:0">Pick an update and an n, and watch what values <code>i</code> takes. Count the passes.</p>
+      <div class="ctl">
+        <select id="tOp">
+          <option value="add1">i = i + 1</option>
+          <option value="add2">i = i + 2</option>
+          <option value="mul2">i = i * 2</option>
+          <option value="div2" selected>i = i // 2</option>
+          <option value="div3">i = i // 3</option>
+        </select>
+        <label>n = <input id="tN" type="number" min="1" max="1000000" value="64"></label>
+      </div>
+      <div class="code" id="tCode"></div>
+      <div class="seq" id="tSeq"></div>
+      <div id="tOut"></div>
+    </div>
+  </section>
+
+  <section id="doubling" class="hide">
+    <div class="card">
+      <h2>What happens when n doubles?</h2>
+      <p class="muted" style="margin-top:0">The core question behind Big O. Rough step counts:</p>
+      <div class="ctl">
+        <label>n = <select id="dN">
+          <option>10</option><option>100</option><option selected>1000</option><option>1000000</option>
+        </select></label>
+      </div>
+      <table id="dTable"></table>
+    </div>
+  </section>
+
+  <section id="cheat" class="hide">
+    <div class="card">
+      <h2>Common operation costs</h2>
+      <div style="overflow-x:auto"><table class="cheat">
+        <thead><tr><th>Operation</th><th>Python</th><th>C#</th><th>Cost</th></tr></thead>
+        <tbody id="cheatBody"></tbody>
+      </table></div>
+      <p class="muted" style="font-size:13px;margin-bottom:0">"Append/Add" is O(1) on average: once in a while the list grows its storage, but spread out over many adds it stays constant.</p>
+    </div>
+  </section>
+</div>
+
+<script>
+const LABEL={"1":"O(1)","logn":"O(log n)","n":"O(n)","nlogn":"O(n log n)","n2":"O(n²)","2n":"O(2ⁿ)"};
+const ORDER=["1","logn","n","nlogn","n2","2n"];
+const TOPICS={basics:"Basics",log:"Log n",hidden:"Hidden loops",rec:"Recursion"};
+
+const Q=[
+// ---------- Basics ----------
+{t:"basics",lang:"Python",code:[["x = nums[0]","1"],["y = nums[-1]","1"],["print(x + y)","1"]],a:"1",
+ eq:["1 + 1 + 1 = 3","No n anywhere → O(1)"],why:"Each line jumps straight to a spot. Nothing grows when the list grows."},
+{t:"basics",lang:"Python",code:[["total = 0","1"],["for x in nums:","× n"],["    total += x","1"],["print(total)","1"]],a:"n",
+ eq:["1 + n × 1 + 1","= n + 2 → O(n)"],why:"The loop runs once per item; everything else is constant."},
+{t:"basics",lang:"Python",code:[["for i in range(10):","× 10"],["    print(nums[i])","1"]],a:"1",
+ eq:["10 × 1 = 10","10 never changes → O(1)"],why:"The loop count is fixed at 10. It doesn't grow when the list grows, so it's constant."},
+{t:"basics",lang:"Python",code:[["for x in nums:","× n"],["    print(x)","1"],["for x in nums:","× n"],["    print(x * 2)","1"]],a:"n",
+ eq:["n × 1 + n × 1","= 2n → O(n)"],why:"Loops one after another add. 2n still just doubles when n doubles, so drop the 2."},
+{t:"basics",lang:"Python",code:[["for a in nums:","× n"],["    for b in nums:","× n"],["        print(a + b)","1"]],a:"n2",
+ eq:["n × n × 1","= n² → O(n²)"],why:"Nested loops multiply: every item gets paired with every item."},
+{t:"basics",lang:"Python",code:[["for x in nums:","× n"],["    print(x)","1"],["for a in nums:","× n"],["    for b in nums:","× n"],["        print(a * b)","1"]],a:"n2",
+ eq:["n × 1 + n × n × 1","= n² + n → O(n²)"],why:"Add the blocks, then keep the biggest term. n² dwarfs n."},
+{t:"basics",lang:"Python",code:[["n = len(nums)","1"],["for i in range(n):","× n"],["    for j in range(i):","× i (0, 1, 2…)"],["        print(i, j)","1"]],a:"n2",
+ eq:["0 + 1 + 2 + … + (n−1)","≈ n²/2 → O(n²)"],why:"The inner loop grows each pass. Half of n² still has the n² shape, so drop the ½."},
+{t:"basics",lang:"Python",code:[["def find(nums, target):",""],["    for x in nums:","× n"],["        if x == target:","1"],["            return True","1"],["    return False","1"]],a:"n",
+ eq:["worst case: n × 1","= n → O(n)"],why:"It might stop early, but Big O assumes the worst case: target missing, every item checked."},
+
+// ---------- Log n ----------
+{t:"log",lang:"Python",code:[["i = 1","1"],["while i < n:","× log n"],["    i = i * 2","1"]],a:"logn",
+ eq:["1 + log n × 1","→ O(log n)"],why:"i jumps 1, 2, 4, 8, 16… Doubling up to n takes the same number of steps as halving down from n."},
+{t:"log",lang:"Python",code:[["i = n","1"],["while i > 1:","× log n"],["    i = i // 2","1"]],a:"logn",
+ eq:["1 + log n × 1","→ O(log n)"],why:"Halving: 64 → 32 → 16 → 8 → 4 → 2 → 1 is 6 passes, and log 64 = 6."},
+{t:"log",lang:"Python",code:[["i = n","1"],["while i > 0:","× n/2"],["    i = i - 2","1"]],a:"n",
+ eq:["1 + n/2 × 1","→ O(n)"],why:"Subtracting walks. Any fixed step size is still O(n); just drop the ½."},
+{t:"log",lang:"Python",code:[["i = n","1"],["while i > 1:","× log n"],["    i = i // 3","1"]],a:"logn",
+ eq:["1 + log n × 1","→ O(log n)"],why:"Dividing by any fixed number (2, 3, 10) is jumping → log n. The base of the log doesn't matter in Big O."},
+{t:"log",lang:"Python",code:[["lo, hi = 0, len(nums) - 1","1"],["while lo <= hi:","× log n"],["    mid = (lo + hi) // 2","1"],["    if nums[mid] == target:","1"],["        return mid","1"],["    elif nums[mid] < target:","1"],["        lo = mid + 1","1"],["    else:",""],["        hi = mid - 1","1"]],a:"logn",
+ eq:["1 + log n × (a few constant lines)","→ O(log n)"],why:"Binary search. Each pass throws away half of what's left, like searching a phone book."},
+{t:"log",lang:"Python",code:[["for x in nums:","× n"],["    i = n","1"],["    while i > 1:","× log n"],["        i = i // 2","1"]],a:"nlogn",
+ eq:["n × (1 + log n × 1)","= n log n + n → O(n log n)"],why:"A halving loop inside a walking loop. Nested means multiply."},
+{t:"log",lang:"Python",code:[["i = n","1"],["while i > 1:","× log n"],["    if i in nums:","n (hidden loop)"],["        print(i)","1"],["    i = i // 2","1"]],a:"nlogn",
+ eq:["log n × (n + 1 + 1)","= n log n + 2 log n → O(n log n)"],why:"Only log n passes, but each pass searches the whole list."},
+{t:"log",lang:"Python · challenge",code:[["i = n","1"],["while i > 1:","× log n"],["    for j in range(i):","× i (n, n/2, n/4…)"],["        print(j)","1"],["    i = i // 2","1"]],a:"n",
+ eq:["n + n/2 + n/4 + n/8 + …","≈ 2n → O(n)"],why:"Tricky one! The inner loop shrinks each pass, so passes × cost doesn't apply directly. Add up the actual work instead: the halves sum to about 2n."},
+
+// ---------- Hidden loops ----------
+{t:"hidden",lang:"Python",code:[["for x in nums:","× n"],["    if x in nums:","n (hidden loop)"],["        print(x)","1"]],a:"n2",
+ eq:["n × (n + 1)","= n² + n → O(n²)"],why:"`in` on a list checks items one by one, and it runs on every pass."},
+{t:"hidden",lang:"Python",code:[["seen = set(nums)","n (copies every item)"],["for x in nums:","× n"],["    if x in seen:","1 (hash lookup)"],["        print(x)","1"]],a:"n",
+ eq:["n + n × (1 + 1)","= 3n → O(n)"],why:"`in` on a set jumps straight to the answer. Building the set costs n once, outside the loop."},
+{t:"hidden",lang:"Python",code:[["while len(nums) > 0:","× n"],["    nums.pop(0)","n (everything shifts)"]],a:"n2",
+ eq:["n + (n−1) + … + 1","≈ n²/2 → O(n²)"],why:"Removing from the front shifts every remaining item down a slot, every pass."},
+{t:"hidden",lang:"Python",code:[["while len(nums) > 0:","× n (len is 1)"],["    nums.pop()","1 (nothing shifts)"]],a:"n",
+ eq:["n × (1 + 1)","= 2n → O(n)"],why:"Removing from the end moves nothing, and len() just reads a stored number."},
+{t:"hidden",lang:"Python",code:[["nums.sort()","n log n"],["for x in nums:","× n"],["    print(x)","1"]],a:"nlogn",
+ eq:["n log n + n × 1","→ O(n log n)"],why:"Good sorting is n log n. It's bigger than the loop's n, so it wins."},
+{t:"hidden",lang:"Python",code:[["for x in nums:","× n"],["    if x == max(nums):","n (scans the list)"],["        print(x)","1"]],a:"n2",
+ eq:["n × (n + 1)","→ O(n²)"],why:"max() looks at every item, every pass. Fix: compute it once before the loop → O(n)."},
+{t:"hidden",lang:"C#",code:[["foreach (var x in list)","× n"],["{",""],["    if (list.Contains(x))","n (hidden loop)"],["        Console.WriteLine(x);","1"],["}",""]],a:"n2",
+ eq:["n × (n + 1)","→ O(n²)"],why:"List.Contains walks the list. A HashSet<T> would make it 1."},
+{t:"hidden",lang:"C#",code:[["var counts = new Dictionary<int, int>();","1"],["foreach (var x in list)","× n"],["    counts[x] = counts.GetValueOrDefault(x) + 1;","1 (hash)"]],a:"n",
+ eq:["1 + n × 1","→ O(n)"],why:"Dictionary reads and writes jump straight to the right slot."},
+{t:"hidden",lang:"C#",code:[["while (list.Count > 0)","× n (Count is 1)"],["    list.RemoveAt(list.Count - 1);","1 (from the end)"]],a:"n",
+ eq:["n × (1 + 1)","→ O(n)"],why:"Count is a stored number, and removing the last item moves nothing."},
+{t:"hidden",lang:"C#",code:[["while (list.Count > 0)","× n"],["    list.RemoveAt(0);","n (everything shifts)"]],a:"n2",
+ eq:["n + (n−1) + … + 1","≈ n²/2 → O(n²)"],why:"Same as Python's pop(0): removing the front shifts everything behind it."},
+{t:"hidden",lang:"C#",code:[["IEnumerable<int> items = GetItems();","1"],["for (int i = 0; i < items.Count(); i++)","× n, and Count() is n"],["    Console.WriteLine(i);","1"]],a:"n2",
+ eq:["n × (n + 1)","→ O(n²)"],why:"LINQ's Count() on an IEnumerable can walk every item, and the condition runs every pass. Store it in a variable first."},
+
+// ---------- Recursion ----------
+{t:"rec",lang:"Python",code:[["def f(n):",""],["    if n <= 1:","1"],["        return","1"],["    f(n - 1)","1 call, n−1 left"]],a:"n",
+ eq:["n calls × 1 work each","= n → O(n)"],why:"Recursion is a loop in disguise: subtract 1 each call → n calls."},
+{t:"rec",lang:"Python",code:[["def f(n):",""],["    if n <= 1:","1"],["        return","1"],["    f(n // 2)","1 call, n/2 left"]],a:"logn",
+ eq:["log n calls × 1 work each","→ O(log n)"],why:"Halving each call, just like a halving loop."},
+{t:"rec",lang:"Python",code:[["def f(n):",""],["    if n <= 1:","1"],["        return","1"],["    for i in range(n):","× n"],["        print(i)","1"],["    f(n - 1)","1 call, n−1 left"]],a:"n2",
+ eq:["n + (n−1) + (n−2) + … + 1","≈ n²/2 → O(n²)"],why:"n calls, and each one loops over its own n. Same triangle as the nested j-in-range(i) loop."},
+{t:"rec",lang:"Python",code:[["def fib(n):",""],["    if n <= 1:","1"],["        return n","1"],["    return fib(n - 1) + fib(n - 2)","2 calls each time"]],a:"2n",
+ eq:["calls per level: 1, 2, 4, 8, …","~n levels → ≈ 2ⁿ calls → O(2ⁿ)"],why:"Each call makes two more, so the call tree doubles every level."},
+{t:"rec",lang:"Python",code:[["def sort(nums):",""],["    if len(nums) <= 1:","1"],["        return nums","1"],["    mid = len(nums) // 2","1"],["    left = sort(nums[:mid])","half the list"],["    right = sort(nums[mid:])","half the list"],["    return merge(left, right)","n (walks both halves)"]],a:"nlogn",
+ eq:["log n levels (halving each time)","× n work per level → O(n log n)"],why:"Merge sort. Halving gives log n levels of calls, and each level merges n items in total."}
+];
+
+const CHEAT=[
+["Get by index","list[i]","list[i]","1"],
+["Length","len(list)","list.Count","1"],
+["Add to end","list.append(x)","list.Add(x)","1"],
+["Remove from end","list.pop()","RemoveAt(Count-1)","1"],
+["Remove from front","list.pop(0)","RemoveAt(0)","n"],
+["Insert at front","list.insert(0, x)","Insert(0, x)","n"],
+["Search a list","x in list","list.Contains(x)","n"],
+["Search a set","x in set","hashSet.Contains(x)","1"],
+["Dictionary lookup","d[key]","dict[key]","1"],
+["Max / min / sum","max(list)","list.Max()","n"],
+["Sort","list.sort()","list.Sort()","n log n"],
+["Copy a list","list[:]","list.ToList()","n"],
+["Count a lazy sequence","—","items.Count()","n"],
+["Build a set","set(list)","new HashSet<T>(list)","n"]
+];
+
+// ---------- helpers ----------
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+const KW=/\b(for|foreach|in|while|if|elif|else|def|return|var|new|int|True|False)\b/g;
+function hl(line){let h=esc(line);h=h.replace(/\b(\d+)\b/g,'<span class="num">$1</span>');return h.replace(KW,'<span class="kw">$1</span>');}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function md(s){return esc(s).replace(/`([^`]+)`/g,"<code>$1</code>");}
+
+// ---------- stats ----------
+function loadStats(){try{const s=JSON.parse(localStorage.getItem("big-o-practice-stats"));if(s&&typeof s.total==="number")return s;}catch(e){}return{right:0,total:0,streak:0,best:0};}
+function saveStats(){try{localStorage.setItem("big-o-practice-stats",JSON.stringify(stats));}catch(e){}}
+let stats=loadStats();
+
+// ---------- practice ----------
+const S={filter:"all",queue:[],idx:-1,hints:0,answered:false,pick:null};
+
+function renderFilters(){
+  const el=document.getElementById("filters");
+  const opts=[["all","All"]].concat(Object.entries(TOPICS));
+  el.innerHTML=opts.map(([k,v])=>`<button class="chip${S.filter===k?" on":""}" data-f="${k}">${v}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{S.filter=b.dataset.f;S.queue=[];renderFilters();nextQ();});
+}
+function renderStats(){
+  const pct=stats.total?Math.round(stats.right/stats.total*100):0;
+  document.getElementById("stats").innerHTML=
+    `<span>Score <b>${stats.right}/${stats.total}</b>${stats.total?` (${pct}%)`:""}</span>`+
+    `<span>Streak <b>${stats.streak}</b></span><span>Best <b>${stats.best}</b></span>`+
+    `<button class="link" id="reset">Reset</button>`;
+  document.getElementById("reset").onclick=()=>{stats={right:0,total:0,streak:0,best:0};saveStats();renderStats();};
+}
+function nextQ(){
+  const pool=Q.map((q,i)=>i).filter(i=>S.filter==="all"||Q[i].t===S.filter);
+  if(!S.queue.length){S.queue=shuffle(pool);if(S.queue.length>1&&S.queue[0]===S.idx)S.queue.push(S.queue.shift());}
+  S.idx=S.queue.shift();S.hints=0;S.answered=false;S.pick=null;renderQ();
+}
+function costLines(q){return q.code.map((l,i)=>l[1]?i:-1).filter(i=>i>=0);}
+function renderQ(){
+  const q=Q[S.idx],cl=costLines(q),shown=new Set(S.answered?cl:cl.slice(0,S.hints));
+  const lastHint=!S.answered&&S.hints>0?cl[S.hints-1]:-1;
+  let h=`<div class="meta"><span class="tag">${TOPICS[q.t]}</span><span class="tag">${q.lang}</span></div>`;
+  h+=`<div class="code">`+q.code.map((l,i)=>`<div class="row${i===lastHint?" lit":""}"><span class="line">${hl(l[0])||" "}</span>${shown.has(i)?`<span class="cost">${esc(l[1])}</span>`:""}</div>`).join("")+`</div>`;
+  h+=`<div class="prompt">What's the Big O?</div><div class="choices">`+ORDER.map(k=>{
+    let c="";if(S.answered){if(k===q.a)c="right";else if(k===S.pick)c="wrong";}
+    return `<button data-k="${k}" class="${c}"${S.answered?" disabled":""}>${LABEL[k]}</button>`;}).join("")+`</div>`;
+  if(!S.answered){
+    h+=`<div class="actions"><button class="btn" id="hint"${S.hints>=cl.length?" disabled":""}>Hint: show a line's cost (${S.hints}/${cl.length})</button><button class="btn" id="skip">Skip</button></div>`;
+  }else{
+    const ok=S.pick===q.a;
+    h+=`<div class="fb ${ok?"good":"bad"}"><div class="verdict">${ok?"Correct!":"Not quite. It's "+LABEL[q.a]+"."}</div>`+
+       `<div class="eq">${q.eq.map(esc).join("<br>")}</div><div>${md(q.why)}</div></div>`+
+       `<div class="actions"><button class="btn primary" id="next">Next snippet</button></div>`;
+  }
+  const card=document.getElementById("qcard");card.innerHTML=h;
+  card.querySelectorAll(".choices button").forEach(b=>b.onclick=()=>answer(b.dataset.k));
+  const hb=document.getElementById("hint");if(hb)hb.onclick=()=>{S.hints++;renderQ();};
+  const sb=document.getElementById("skip");if(sb)sb.onclick=nextQ;
+  const nb=document.getElementById("next");if(nb)nb.onclick=()=>{nextQ();window.scrollTo({top:0,behavior:"smooth"});};
+}
+function answer(k){
+  if(S.answered)return;
+  const q=Q[S.idx];S.answered=true;S.pick=k;stats.total++;
+  if(k===q.a){stats.right++;stats.streak++;stats.best=Math.max(stats.best,stats.streak);}else stats.streak=0;
+  saveStats();renderStats();renderQ();
+}
+
+// ---------- tracer ----------
+const OPS={
+  add1:{start:"0",cond:"i < n",upd:"i = i + 1",init:n=>0,test:(i,n)=>i<n,step:i=>i+1},
+  add2:{start:"0",cond:"i < n",upd:"i = i + 2",init:n=>0,test:(i,n)=>i<n,step:i=>i+2},
+  mul2:{start:"1",cond:"i < n",upd:"i = i * 2",init:n=>1,test:(i,n)=>i<n,step:i=>i*2},
+  div2:{start:"n",cond:"i > 1",upd:"i = i // 2",init:n=>n,test:(i,n)=>i>1,step:i=>Math.floor(i/2)},
+  div3:{start:"n",cond:"i > 1",upd:"i = i // 3",init:n=>n,test:(i,n)=>i>1,step:i=>Math.floor(i/3)}
+};
+function renderTracer(){
+  const op=OPS[document.getElementById("tOp").value];
+  let n=parseInt(document.getElementById("tN").value,10);if(!(n>=1))n=1;if(n>1000000)n=1000000;
+  document.getElementById("tCode").innerHTML=[`i = ${op.start}`,`while ${op.cond}:`,`    ${op.upd}`].map(l=>`<div class="row"><span class="line">${hl(l)}</span></div>`).join("");
+  const vals=[];let i=op.init(n),passes=0;
+  while(op.test(i,n)){vals.push(i);i=op.step(i);passes++;}
+  let seq;
+  if(vals.length<=30)seq=vals.join(" → ");
+  else seq=vals.slice(0,15).join(" → ")+" → … → "+vals.slice(-5).join(" → ");
+  document.getElementById("tSeq").textContent=vals.length?"i: "+seq:"(the loop never runs)";
+  const lg=Math.log2(n);
+  const kind=op.upd.includes("+")?"walking, so it grows with n → O(n)":"jumping, so it grows with log n → O(log n)";
+  document.getElementById("tOut").innerHTML=`<div class="big">${passes.toLocaleString()} passes</div>`+
+    `<div class="muted">For comparison: n = ${n.toLocaleString()}, log₂ n ≈ ${lg.toFixed(1)}</div>`+
+    `<p style="margin-bottom:0">This loop is ${kind}. Try doubling n and see how much the pass count changes.</p>`;
+}
+
+// ---------- doubling ----------
+function steps(k,n){return k==="1"?1:k==="logn"?Math.log2(n):k==="n"?n:k==="nlogn"?n*Math.log2(n):k==="n2"?n*n:Math.pow(2,n);}
+function fmt(k,n){
+  if(k==="2n"&&n>50)return "≈ 10^"+Math.round(n*Math.log10(2));
+  const v=steps(k,n);
+  if(v>=1e12)return "≈ "+(v/1e12).toLocaleString(undefined,{maximumFractionDigits:1})+" trillion";
+  return v.toLocaleString(undefined,{maximumFractionDigits:v<100?1:0});
+}
+const GROW={"1":"same","logn":"+1 step","n":"×2","nlogn":"a bit over ×2","n2":"×4","2n":"squared!"};
+function renderDoubling(){
+  const n=parseInt(document.getElementById("dN").value,10);
+  document.getElementById("dTable").innerHTML=`<thead><tr><th></th><th>n = ${n.toLocaleString()}</th><th>n = ${(2*n).toLocaleString()}</th><th>Change</th></tr></thead><tbody>`+
+    ORDER.map(k=>`<tr><td><b>${LABEL[k]}</b></td><td>${fmt(k,n)}</td><td>${fmt(k,2*n)}</td><td>${GROW[k]}</td></tr>`).join("")+"</tbody>";
+}
+
+// ---------- cheat sheet ----------
+document.getElementById("cheatBody").innerHTML=CHEAT.map(r=>`<tr><td>${r[0]}</td><td><code>${esc(r[1])}</code></td><td><code>${esc(r[2])}</code></td><td><b>${r[3]==="1"?"O(1)":"O("+r[3]+")"}</b></td></tr>`).join("");
+
+// ---------- tabs ----------
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#tabs button").forEach(x=>x.classList.toggle("on",x===b));
+  document.querySelectorAll("section").forEach(s=>s.classList.toggle("hide",s.id!==b.dataset.tab));
+});
+document.getElementById("tOp").onchange=renderTracer;
+document.getElementById("tN").oninput=renderTracer;
+document.getElementById("dN").onchange=renderDoubling;
+
+renderFilters();renderStats();nextQ();renderTracer();renderDoubling();
+</script>
+</body>
+</html>
